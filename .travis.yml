@@ -1,0 +1,13 @@
+---
+language: perl
+addons:
+  apt:
+    packages:
+      - parallel
+cache:
+  directories:
+    - $HOME/perl5
+before_install:
+  - eval $(curl https://travis-perl.github.io/init) --perl --always-upgrade-modules
+script:
+  - make test
