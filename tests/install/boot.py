@@ -1,5 +1,7 @@
 from testapi import *
-import utils
 
 def run(self):
-    wait_for_desktop()
+    assert_screen('boot-menu', 'openqa-desktop'])
+    if match_has_tag('boot-menu'):
+        send_key('ret')
+    assert_screen('openqa-desktop', 500)
