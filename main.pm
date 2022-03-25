@@ -25,12 +25,12 @@ sub load_update_tests() {
 
 sub load_install_tests() {
     loadtest "install/boot.pm";
-    loadtest "install/openqa_webui.pm";
-    # for now when testing from git only tests the webui itself, not worker
-    # interaction
-    return 1 if check_var('OPENQA_FROM_GIT', 1);
-    loadtest "install/openqa_worker.pm";
-    loadtest "install/test_distribution.pm";
+    #    loadtest "install/openqa_webui.pm";
+    #    # for now when testing from git only tests the webui itself, not worker
+    #    # interaction
+    #    return 1 if check_var('OPENQA_FROM_GIT', 1);
+    #    loadtest "install/openqa_worker.pm";
+    #    loadtest "install/test_distribution.pm";
 }
 
 sub load_osautoinst_tests() {
