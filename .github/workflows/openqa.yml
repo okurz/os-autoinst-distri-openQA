@@ -1,0 +1,28 @@
+---
+name: openQA - github action example
+# yamllint disable-line rule:truthy
+on:
+  push:
+  pull_request:
+  issue_comment:
+    types: [created, edited]
+  workflow_dispatch:
+env:
+  OPENQA_TOKEN: ${{ secrets.OPENQA_O3_USER_KEY_SECRET }}
+  OPENQA_HOST: https://openqa.opensuse.org
+
+jobs:
+  trigger_and_monitor_openqa:
+    runs-on: ubuntu-latest
+    container:
+      image: registry.opensuse.org/home/okurz/container/containers/tumbleweed:curl-jq
+    steps:
+      - name: trigger and monitor openQA test
+        run: >
+          set -xeuo pipefail &&
+          repo_ref=$GITHUB_REPOSITORY#$GITHUB_REF_NAME &&
+          job_id=$(set -x && curl -sS -u $OPENQA_TOKEN -X POST -d "CASEDIR=$GITHUB_SERVER_URL/$repo_ref" -d "TEST=test-$GITHUB_EVENT_NAME-$repo_ref" -d "BUILD=$repo_ref" -d "DISTRI=openqa" -d "NEEDLES_DIR=openqa/needles" $OPENQA_HOST/api/v1/jobs | jq .id) || echo "Failed: $job_id" &&
+          job=$OPENQA_HOST/api/v1/jobs/$job_id &&
+          while :; do read state result < <(echo $(curl -sS $job | jq -r .job.state,.job.result)) && [[ $state = 'done' ]] && break || echo "job state of job ID $job_id : $state, waiting…" && sleep 10; done &&
+          echo "job ID $job_id : state: $state, result: $result" &&
+          [[ $result = 'passed' ]]
